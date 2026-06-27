@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button, Slider
 import time
@@ -8,16 +7,12 @@ import time
 class Replay:
 
     def __init__(self, file):
-
         self.df = pd.read_csv(file)
-
         self.i = 0
         self.playing = True
         self.speed = 1.0
 
-
         self.fig, self.axs = plt.subplots(2, 2, figsize=(10, 8))
-
         self.ax_traj = self.axs[0, 0]
         self.ax_state = self.axs[0, 1]
         self.ax_ctrl = self.axs[1, 0]
@@ -25,15 +20,11 @@ class Replay:
 
         ax_play = plt.axes([0.7, 0.02, 0.1, 0.05])
         ax_speed = plt.axes([0.2, 0.02, 0.4, 0.03])
-
         self.btn_play = Button(ax_play, "Play/Pause")
         self.btn_play.on_clicked(self.toggle)
-
         self.slider = Slider(ax_speed, "Speed", 0.1, 3.0, valinit=1.0)
         self.slider.on_changed(self.set_speed)
-
-        self.fig.suptitle("Quadrotor Flight Replay (PX4-style)")
-
+        self.fig.suptitle("Quadrotor Flight Replay")
         plt.ion()
 
     def toggle(self, event):
@@ -43,34 +34,21 @@ class Replay:
         self.speed = val
 
     def update(self):
-
         if not self.playing:
             plt.pause(0.05)
             return
-
         if self.i >= len(self.df):
             return
 
         row = self.df.iloc[self.i]
-
-        x = row["x"]
-        z = row["z"]
-        xr = row["x_ref"]
-        zr = row["z_ref"]
-        u1 = row["u1"]
-        u2 = row["u2"]
-
-        ex = row["x"] - row["x_ref"]
-        ez = row["z"] - row["z_ref"]
-
+        x, z = row["x"], row["z"]
+        xr, zr = row["x_ref"], row["z_ref"]
 
         self.ax_traj.clear()
         self.ax_traj.plot(self.df["x"], self.df["z"], alpha=0.3)
         self.ax_traj.plot(self.df["x_ref"], self.df["z_ref"], "--")
-
         self.ax_traj.scatter(x, z, c="red")
         self.ax_traj.set_title("2D Flight")
-
 
         self.ax_state.clear()
         self.ax_state.plot(self.df["x"], label="x")
@@ -91,12 +69,10 @@ class Replay:
         self.ax_err.set_title("Tracking error")
 
         plt.pause(0.001)
-
         self.i += int(self.speed)
 
 
 replay = Replay("quad_log.csv")
-
 while True:
     replay.update()
     time.sleep(0.03)

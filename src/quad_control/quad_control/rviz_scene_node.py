@@ -27,7 +27,6 @@ class RvizScene(Node):
         self.ref_pub = self.create_publisher(Marker, "/rviz/ref", 10)
 
         self.timer = self.create_timer(0.05, self.update)
-        self.get_logger().info("RViz scene started — corridor ±5m")
 
     def state_cb(self, msg):
         self.x = msg.data[0]
@@ -120,11 +119,5 @@ class RvizScene(Node):
 
 def main():
     rclpy.init()
-    node = RvizScene()
-    rclpy.spin(node)
-    node.destroy_node()
+    rclpy.spin(RvizScene())
     rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()

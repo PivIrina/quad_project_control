@@ -24,7 +24,7 @@ def generate_launch_description():
             output="screen"
         ),
 
-        # Траектория
+        # траектория
         Node(
             package="quad_control",
             executable="trajectory",
@@ -37,7 +37,7 @@ def generate_launch_description():
                 # задать свои точки 
                 # "waypoints": "0,3,2,5,-2,4,0,6,3,3,-3,2,0,3",
 
-                "hold_time": 5.0,         
+                "hold_time": 8.0,         
             }]
         ),
 

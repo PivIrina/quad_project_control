@@ -20,17 +20,10 @@ class LoggerNode(Node):
         self.control = None
         self.t0 = time.time()
 
-        self.create_subscription(
-            Float32MultiArray, "/quad/state", self.state_cb, 10
-        )
-        self.create_subscription(
-            Float32MultiArray, "/quad/reference", self.ref_cb, 10
-        )
-        self.create_subscription(
-            Float32MultiArray, "/quad/control", self.control_cb, 10
-        )
+        self.create_subscription(Float32MultiArray, "/quad/state", self.state_cb, 10)
+        self.create_subscription(Float32MultiArray, "/quad/reference", self.ref_cb, 10)
+        self.create_subscription(Float32MultiArray, "/quad/control", self.control_cb, 10)
         self.timer = self.create_timer(0.1, self.log)
-        self.get_logger().info("Logger started")
 
     def state_cb(self, msg):
         self.state = msg.data
@@ -57,11 +50,5 @@ class LoggerNode(Node):
 
 def main():
     rclpy.init()
-    node = LoggerNode()
-    rclpy.spin(node)
-    node.destroy_node()
+    rclpy.spin(LoggerNode())
     rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()

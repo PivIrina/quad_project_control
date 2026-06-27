@@ -5,7 +5,6 @@ import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 from collections import deque
-import numpy as np
 
 
 class Visualizer(Node):
@@ -37,7 +36,6 @@ class Visualizer(Node):
         plt.ion()
         self.fig, self.axs = plt.subplots(3, 1, figsize=(10, 10))
         self.timer = self.create_timer(0.1, self.update_plot)
-        self.get_logger().info("Visualizer ready")
 
     def state_cb(self, msg):
         self.x = msg.data[0]
@@ -71,13 +69,8 @@ class Visualizer(Node):
         ax.axvline(5, color="gray", linestyle="--", alpha=0.3)
         ax.axhline(0, color="gray", linestyle="--", alpha=0.3)
         ax.axhline(10, color="gray", linestyle="--", alpha=0.3)
-
-        # след
         if len(self.x_hist) > 1:
-            ax.plot(list(self.x_hist), list(self.z_hist), 
-                    'b-', linewidth=1.0, alpha=0.5)
-
-        # крест
+            ax.plot(list(self.x_hist), list(self.z_hist), 'b-', linewidth=1.0, alpha=0.5)
         if len(self.xr_hist) > 0:
             unique_x, unique_z = [], []
             prev = None
@@ -87,10 +80,7 @@ class Visualizer(Node):
                     unique_z.append(zr)
                     prev = (xr, zr)
             ax.plot(unique_x, unique_z, 'rx', markersize=10, markeredgewidth=2)
-
-        # дрон
         ax.plot(self.x, self.z, 'bo', markersize=8)
-
         ax.set_xlim(-6, 6)
         ax.set_ylim(-0.5, 10.5)
         ax.set_xlabel("X [m]")
@@ -99,8 +89,7 @@ class Visualizer(Node):
         ax.grid(True, alpha=0.3)
         ax.set_aspect("equal")
 
-        # ошибка 2
-        ax = self.axs[1] 
+        ax = self.axs[1]
         t_arr = list(self.t_hist)
         ax.plot(t_arr, list(self.ex_hist), 'b-', linewidth=1.0, label="X error")
         ax.plot(t_arr, list(self.ez_hist), 'r-', linewidth=1.0, label="Z error")
@@ -111,7 +100,6 @@ class Visualizer(Node):
         ax.legend(fontsize=8)
         if len(t_arr) > 0:
             ax.set_xlim(max(0, t_arr[-1] - 30), max(30, t_arr[-1]))
-
 
         ax = self.axs[2]
         t_arr = list(self.t_hist)
@@ -131,11 +119,8 @@ class Visualizer(Node):
             ax.set_xlim(max(0, t_u[-1] - 30), max(30, t_u[-1]))
 
         plt.tight_layout()
-        try:
-            self.fig.canvas.draw()
-            self.fig.canvas.flush_events()
-        except:
-            pass
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
 
 
 def main():
@@ -149,7 +134,3 @@ def main():
         plt.close("all")
         node.destroy_node()
         rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()

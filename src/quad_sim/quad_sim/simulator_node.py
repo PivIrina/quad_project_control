@@ -10,7 +10,6 @@ class SimulatorNode(Node):
     def __init__(self):
         super().__init__("simulator")
 
-        
         self.declare_parameter("wind_amplitude", 1.0)
         self.declare_parameter("wind_frequency", 0.5)
 
@@ -37,14 +36,8 @@ class SimulatorNode(Node):
         self.wind = WindModel(amplitude=wind_amp, frequency=wind_freq)
 
         self.state_pub = self.create_publisher(Float32MultiArray, "/quad/state", 10)
-        self.control_sub = self.create_subscription(
-            Float32MultiArray, "/quad/control", self.control_callback, 10
-        )
+        self.control_sub = self.create_subscription(Float32MultiArray, "/quad/control", self.control_callback, 10)
         self.timer = self.create_timer(self.dt, self.step)
-
-        self.get_logger().info(
-            f"Simulator ready | wind: A={wind_amp}, f={wind_freq} | corridor ±5m"
-        )
 
     def control_callback(self, msg):
         self.u1 = float(msg.data[0])
@@ -68,37 +61,21 @@ class SimulatorNode(Node):
         self.theta += self.omega * self.dt
 
         if self.x < -5.0:
-            self.x = -4.5
-            self.vx = abs(self.vx) * 0.8
-            self.theta = 0.0
-            self.omega = 0.0
+            self.x = -4.5; self.vx = abs(self.vx) * 0.8; self.theta = 0.0; self.omega = 0.0
         if self.x > 5.0:
-            self.x = 4.5
-            self.vx = -abs(self.vx) * 0.8
-            self.theta = 0.0
-            self.omega = 0.0
+            self.x = 4.5; self.vx = -abs(self.vx) * 0.8; self.theta = 0.0; self.omega = 0.0
         if self.z < 0.0:
-            self.z = 0.0
-            self.vz = abs(self.vz) * 0.5
+            self.z = 0.0; self.vz = abs(self.vz) * 0.5
         if self.z > 10.0:
-            self.z = 10.0
-            self.vz = -abs(self.vz) * 0.5
+            self.z = 10.0; self.vz = -abs(self.vz) * 0.5
 
         msg = Float32MultiArray()
-        msg.data = [
-            float(self.x), float(self.z), float(self.theta),
-            float(self.vx), float(self.vz), float(self.omega)
-        ]
+        msg.data = [float(self.x), float(self.z), float(self.theta),
+                    float(self.vx), float(self.vz), float(self.omega)]
         self.state_pub.publish(msg)
 
 
 def main():
     rclpy.init()
-    node = SimulatorNode()
-    rclpy.spin(node)
-    node.destroy_node()
+    rclpy.spin(SimulatorNode())
     rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()
